@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Todo - Apprendre Docker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #5568d3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .items-list {
+            list-style: none;
+        }
+
+        .item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .item.completed .item-name {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .item-name {
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toggle-btn, .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: opacity 0.3s;
+        }
+
+        .toggle-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .toggle-btn.undo {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .toggle-btn:hover, .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+
+        .api-info {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+
+        .api-url {
+            font-family: 'Courier New', monospace;
+            break-word: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Todo App</h1>
+        <p class="subtitle">Apprendre Docker - Simple CRUD API</p>
+
+        <div class="api-info">
+            <strong>API Backend:</strong><br>
+            <span class="api-url" id="apiUrl">http://localhost:3000/api</span>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="input-group">
+            <input type="text" id="itemInput" placeholder="Ajouter une nouvelle tâche...">
+            <button onclick="addItem()" class="add-btn">Ajouter</button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            ⏳ Chargement...
+        </div>
+
+        <ul id="itemsList" class="items-list"></ul>
+
+        <div id="emptyMessage" class="empty-message" style="display: none;">
+            Aucune tâche. Ajoutez-en une pour commencer!
+        </div>
+    </div>
+
+    <script>
+        // Configuration de l'API
+        const API_BASE_URL = '/api'; // Utiliser un chemin relatif pour que le proxy fonctionne
+
+        // Afficher l'URL de l'API
+        document.getElementById('apiUrl').textContent = window.location.origin + API_BASE_URL;
+
+        // Charger les items au démarrage
+        document.addEventListener('DOMContentLoaded', () => {
+            loadItems();
+            // Recharger les items toutes les 5 secondes
+            setInterval(loadItems, 5000);
+        });
+
+        // Charger la liste des items
+        async function loadItems() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                const response = await fetch(`${API_BASE_URL}/items`);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderItems(result.data);
+                    hideStatus();
+                } else {
+                    showStatus('Erreur lors du chargement', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Impossible de se connecter à l\'API', 'error');
+                document.getElementById('itemsList').innerHTML = '';
+                document.getElementById('emptyMessage').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Afficher les items
+        function renderItems(items) {
+            const list = document.getElementById('itemsList');
+            list.innerHTML = '';
+
+            if (items.length === 0) {
+                document.getElementById('emptyMessage').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('emptyMessage').style.display = 'none';
+
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `item ${item.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <span class="item-name">${escapeHtml(item.name)}</span>
+                    <div class="item-actions">
+                        <button class="toggle-btn ${item.completed ? 'undo' : ''}" 
+                                onclick="toggleItem(${item.id}, ${item.completed})">
+                            ${item.completed ? '↩ Annuler' : '✓ Fait'}
+                        </button>
+                        <button class="delete-btn" onclick="deleteItem(${item.id})">Supprimer</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // Ajouter un item
+        async function addItem() {
+            const input = document.getElementById('itemInput');
+            const name = input.value.trim();
+
+            if (!name) {
+                showStatus('Veuillez entrer une tâche', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    input.value = '';
+                    showStatus('Tâche ajoutée avec succès!', 'success');
+                    loadItems();
+                } else {
+                    showStatus('Erreur lors de l\'ajout', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Impossible d\'ajouter la tâche', 'error');
+            }
+        }
+
+        // Mettre à jour l'état d'une tâche (complétée ou non)
+        async function toggleItem(id, completed) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ completed: !completed })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('Tâche mise à jour!', 'success');
+                    loadItems();
+                } else {
+                    showStatus('Erreur lors de la mise à jour', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Impossible de mettre à jour la tâche', 'error');
+            }
+        }
+
+        // Supprimer une tâche
+        async function deleteItem(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('Tâche supprimée!', 'success');
+                    loadItems();
+                } else {
+                    showStatus('Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Impossible de supprimer la tâche', 'error');
+            }
+        }
+
+        // Afficher un message de statut
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            setTimeout(hideStatus, 3000);
+        }
+
+        // Masquer le message de statut
+        function hideStatus() {
+            const status = document.getElementById('status');
+            status.className = 'status';
+        }
+
+        // Échapper les caractères HTML pour éviter les injections XSS
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Permettre d'ajouter un item en appuyant sur Entrée
+        document.getElementById('itemInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addItem();
+            }
+        });
+    </script>
+</body>
+</html>

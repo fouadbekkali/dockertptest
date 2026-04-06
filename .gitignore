@@ -1,0 +1,34 @@
+# Dépendances
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Fichiers de build
+dist/
+build/
+
+# Docker
+.docker/
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
