@@ -219,3 +219,21 @@ docker-compose up
 ---
 
 **Happy Learning avec Docker! 🚀**
+
+## TP
+# 1 images 
+docker pull node:18 
+docker pull mysql:8.0 
+docker pull phpmyadmin/phpmyadmin 
+# 2 network 
+docker network create todo_network
++ la modification sur server.js (backend)
+# 3  volume
+docker volume create todo_data
+# 4 containers
+docker run -d --name mysql_db --network todo_network -v todo_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=tododb -p 3307:3306 mysql   (3307 cause le port 3306 est reserver)
+# lancement du phpmyadmin
+docker run -d --name my_phpmyadmin --network todo_network -e PMA_HOST=mysql_db -p 8080:80 phpmyadmin/phpmyadmin
+# docker-compose.yml (hada bax matb9ax t executes les commandes kola mara howa kitklf) test b docker-compose up -d w raddi icree lik les containers irbthom f network + ecree volumes  
+# Dockerfile hada likat7t fih lwasfa siryaa dyaal projet dyaalk okat7t wa7d fl front o wa7d fl back 
+

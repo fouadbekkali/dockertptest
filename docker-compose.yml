@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # 1. Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: tododb
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - todo_net
+
+  # 2. Interface phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: my_phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+    networks:
+      - todo_net
+
+  # 3. Backend (Node.js)
+  backend:
+    build: ./backend
+    container_name: backend_app
+    ports:
+      - "8002:8002"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: secret
+      DB_NAME: tododb
+    depends_on:
+      - db
+    networks:
+      - todo_net
+  # 4. Frontend (React)
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "3002:3002"
+    depends_on:
+      - backend
+    networks:
+      - todo_net
+networks:
+  todo_net:
+    driver: bridge
+
+volumes:
+  db_data:

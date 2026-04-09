@@ -22,7 +22,7 @@ const db = mysql.createPool({
   port: 3308
 });
 // Middleware
-app.use(cors());
+app.use(cors()); // by hamid mohim dakxi dyaal l7imaya okdaa 
 app.use(express.json());
 
 // Routes
