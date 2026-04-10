@@ -15,11 +15,11 @@ const PORT = 8002;
 // });
 // Connexion à la base de données MySQL (Mise à jour pour XAMPP/Localhost)
 const db = mysql.createPool({
-  host: 'localhost',      // Bdlna 'mysql' b 'localhost'
-  user: 'root',           // F XAMPP l'user par défaut howa 'root'
-  password: '',           // F XAMPP l'password par défaut kaykoun khawi
-  database: 'tododb',     // Smiyat la base de données
-  port: 3308
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'tododb',
+  port: 3306
 });
 // Middleware
 app.use(cors()); // by hamid mohim dakxi dyaal l7imaya okdaa 

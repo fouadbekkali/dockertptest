@@ -242,6 +242,9 @@
             try {
                 document.getElementById('loading').style.display = 'block';
                 const response = await fetch(`${API_BASE_URL}/items`);
+                if(!response) {
+                    alert('awiiiiiiiiiliii hada maloooh');
+                }
                 const result = await response.json();
 
                 if (result.success) {

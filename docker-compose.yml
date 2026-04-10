@@ -1,5 +1,5 @@
 version: '3.8'
-
+# services shno khassk tkhadeem
 services:
   # 1. Database MySQL
   db:
@@ -13,6 +13,8 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - todo_net
+    ports:
+      - "3306:3306" # Map port 3306 inside the container to 3308 on the host
 
   # 2. Interface phpMyAdmin
   phpmyadmin:
@@ -21,7 +23,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: db # Le nom du service de la base de données défini dans ce fichier (db)
     depends_on:
       - db
     networks:
@@ -35,6 +37,7 @@ services:
       - "8002:8002"
     environment:
       DB_HOST: db
+      DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: secret
       DB_NAME: tododb

@@ -17,13 +17,11 @@ app.use(express.static(path.join(__dirname)));
 //   }
 // Proxy pour les appels API vers le backend
 app.use('/api', createProxyMiddleware({
-  // Bdel had l'URL b localhost:8002 direct ila knti machi f Docker
-  target: `http://localhost:8002`, 
+  target: `http://localhost:8002`,
   changeOrigin: true,
   pathRewrite: {
     '^/api': '/api'
   },
-  
   onError: (err, req, res) => {
     console.error('Erreur du proxy:', err);
     res.status(503).json({

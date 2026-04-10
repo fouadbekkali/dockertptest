@@ -234,6 +234,7 @@ docker volume create todo_data
 docker run -d --name mysql_db --network todo_network -v todo_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=tododb -p 3307:3306 mysql   (3307 cause le port 3306 est reserver)
 # lancement du phpmyadmin
 docker run -d --name my_phpmyadmin --network todo_network -e PMA_HOST=mysql_db -p 8080:80 phpmyadmin/phpmyadmin
-# docker-compose.yml (hada bax matb9ax t executes les commandes kola mara howa kitklf) test b docker-compose up -d w raddi icree lik les containers irbthom f network + ecree volumes  
+# docker-compose.yml (hada bax matb9ax t executes les commandes kola mara howa kitklf) test b docker-compose up -d w raddi icree lik les containers irbthom f network + ecree volumes  ohya liraddi idirha dak khouna liraddi iclone projet dyaalk 3aando bach itbuilda lprjet dakxi liglna 
 # Dockerfile hada likat7t fih lwasfa siryaa dyaal projet dyaalk okat7t wa7d fl front o wa7d fl back 
 
+# ida tlaa3lk hadxi f rask obriti tsdd kolchi dir docker-compose down  
