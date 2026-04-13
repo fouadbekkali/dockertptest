@@ -15,9 +15,9 @@ const PORT = 8002;
 // });
 // Connexion à la base de données MySQL (Mise à jour pour XAMPP/Localhost)
 const db = mysql.createPool({
-  host: 'localhost',
+  host: 'mysql_db',
   user: 'root',
-  password: '',
+  password: 'secret',
   database: 'tododb',
   port: 3306
 });
@@ -37,18 +37,18 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// GET - Récupérer un item par ID
-app.get('/api/items/:id', (req, res) => {
-  db.query('SELECT * FROM items WHERE id = ?', [req.params.id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Erreur DB', error: err });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Item non trouvé' });
-    }
-    res.json({ success: true, data: results[0] });
-  });
-});
+// // GET - Récupérer un item par ID
+// app.get('/api/items/:id', (req, res) => {
+//   db.query('SELECT * FROM items WHERE id = ?', [req.params.id], (err, results) => {
+//     if (err) {
+//       return res.status(500).json({ success: false, message: 'Erreur DB', error: err });
+//     }
+//     if (results.length === 0) {
+//       return res.status(404).json({ success: false, message: 'Item non trouvé' });
+//     }
+//     res.json({ success: true, data: results[0] });
+//   });
+// });
 
 // POST - Créer un nouvel item
 app.post('/api/items', (req, res) => {

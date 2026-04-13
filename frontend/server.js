@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname)));
 //   }
 // Proxy pour les appels API vers le backend
 app.use('/api', createProxyMiddleware({
-  target: `http://localhost:8002`,
+  target: `http://backend:8002`,
   changeOrigin: true,
   pathRewrite: {
     '^/api': '/api'

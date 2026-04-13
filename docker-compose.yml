@@ -14,7 +14,8 @@ services:
     networks:
       - todo_net
     ports:
-      - "3306:3306" # Map port 3306 inside the container to 3308 on the host
+      - "3307:3306" # 3307 7iit nta db khasssk trserver xi port mn pc dyalk okangolo b7al ila jat xi demande lport 3307 ghadi tdir redirect lport 3306 li howa port dyal mysql f container
+      
 
   # 2. Interface phpMyAdmin
   phpmyadmin:
